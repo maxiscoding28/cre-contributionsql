@@ -50,7 +50,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Define username and date range
-    username = "maxiscoding28"
+    username = GITHUB_USERNAME
     since = (datetime.now() - timedelta(days=90)).isoformat()
 
     # Fetch user activity
