@@ -8,9 +8,14 @@ from gql_classes import *
 # VARIABLES
 GITHUB_GRAPHQL_API_URL = "https://api.github.com/graphql"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
+GITHUB_ORGS = os.getenv("GITHUB_ORGS", "github,githubcustomers").split(",")
+
 if not GITHUB_TOKEN:
     raise EnvironmentError("GITHUB_TOKEN is not set in the environment variables.")
 GITHUB_GRAPHQL_API_URL = "https://api.github.com/graphql"
+if not GITHUB_USERNAME:
+    raise EnvironmentError("GITHUB_USERNAME is not set in the environment variables.")
 
 # REQUEST LOGIC
 def execute_query(query):
@@ -21,14 +26,13 @@ def execute_query(query):
 
 def fetch_user_activity(username):
     since = (datetime.now() - timedelta(days=90)).isoformat()
-    orgs = ["github", "githubcustomers"]
 
     queries = {
-        "pull_requests": PullRequest(orgs, username, since),
-        "issues": Issue(orgs, username, since),
-        "issue_comments": IssueComment(orgs, username, since),
-        "pr_comments": PRComment(orgs, username, since),
-        "discussion_comments": DiscussionComment(orgs, username, since),
+        "pull_requests": PullRequest(GITHUB_ORGS, username, since),
+        "issues": Issue(GITHUB_ORGS, username, since),
+        "issue_comments": IssueComment(GITHUB_ORGS, username, since),
+        "pr_comments": PRComment(GITHUB_ORGS, username, since),
+        "discussion_comments": DiscussionComment(GITHUB_ORGS, username, since),
     }
 
     results = {}
@@ -54,8 +58,9 @@ if __name__ == "__main__":
 
     # Common metadata for all outputs
     metadata = {
-        "username": username,
-        "since": since
+        "username": GITHUB_USERNAME,
+        "since": since,
+        "organizations": GITHUB_ORGS
     }
 
     # Handle output based on flags
